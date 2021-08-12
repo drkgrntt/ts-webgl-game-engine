@@ -1,12 +1,14 @@
-import GLBuffer, { AttributeInfo } from './core/gl/GLBuffer.js'
 import GLUtilities, { gl } from './core/gl/GLUtilities.js'
 import Shader from './core/gl/Shader.js'
+import Sprite from './core/graphics/sprite.js'
+import Matrix4x4 from './core/math/Matrix4x4.js'
 
 export default class Engine {
   private _canvas: HTMLCanvasElement
   private _shader: Shader
+  private _projection: Matrix4x4
 
-  private _buffer: GLBuffer
+  private _sprite: Sprite
 
   constructor() {}
 
@@ -19,7 +21,21 @@ export default class Engine {
     this.loadShaders()
     this._shader.use()
 
-    this.createBuffer()
+    // Load
+    this._projection = Matrix4x4.orthographic(
+      0,
+      this._canvas.width,
+      0,
+      this._canvas.height,
+      -100,
+      100
+    )
+
+    this._sprite = new Sprite('test')
+    this._sprite.load()
+
+    this._sprite.position.y = 200
+    this._sprite.position.x = 100
 
     this.loop()
   }
@@ -29,10 +45,26 @@ export default class Engine {
 
     // Set uniforms
     const colorPosition = this._shader.getUniformLocation('u_color')
-    gl.uniform4f(colorPosition, 1, 0.5, 0, 1)
+    gl.uniform4f(colorPosition, 0, 1, 0.5, 1)
 
-    this._buffer.bind()
-    this._buffer.draw()
+    const projectionPosition =
+      this._shader.getUniformLocation('u_projection')
+    gl.uniformMatrix4fv(
+      projectionPosition,
+      false,
+      new Float32Array(this._projection.data)
+    )
+
+    const modelLocation = this._shader.getUniformLocation('u_model')
+    gl.uniformMatrix4fv(
+      modelLocation,
+      false,
+      new Float32Array(
+        Matrix4x4.translation(this._sprite.position).data
+      )
+    )
+
+    this._sprite.draw()
 
     requestAnimationFrame(this.loop.bind(this))
   }
@@ -42,38 +74,19 @@ export default class Engine {
 
     this._canvas.width = window.innerWidth
     this._canvas.height = window.innerHeight
-    gl.viewport(0, 0, this._canvas.width, this._canvas.height)
-  }
 
-  private createBuffer() {
-    this._buffer = new GLBuffer(3)
-
-    const positionAttribute = new AttributeInfo()
-    positionAttribute.location =
-      this._shader.getAttributeLocation('a_position')
-    positionAttribute.offset = 0
-    positionAttribute.size = 3
-
-    this._buffer.addAttributeLocation(positionAttribute)
-
-    // prettier-ignore
-    const vertices = [
-       0.0,  0.5, 0.0,
-      -0.3, -0.4, 0.0,
-       0.3, -0.4, 0.0
-    ]
-
-    this._buffer.pushBackData(vertices)
-    this._buffer.upload()
-    this._buffer.unbind()
+    gl.viewport(-1, 1, -1, 1)
   }
 
   private loadShaders(): void {
     const vertexShaderSource = `
 attribute vec3 a_position;
 
+uniform mat4 u_projection;
+uniform mat4 u_model;
+
 void main() {
-  gl_Position = vec4(a_position, 1.0);
+  gl_Position = u_projection * u_model * vec4(a_position, 1.0);
 }
     `
 
