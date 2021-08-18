@@ -1,31 +1,13 @@
 import { gl } from './GLUtilities.js'
 
-export default class Shader {
+export default abstract class Shader {
   private _name: string
   private _program: WebGLProgram
   private _attributes: Record<string, number> = {}
   private _uniforms: Record<string, WebGLUniformLocation> = {}
 
-  constructor(
-    name: string,
-    vertexSource: string,
-    fragmentSource: string
-  ) {
+  constructor(name: string) {
     this._name = name
-
-    const vertexShader = this.loadShader(
-      vertexSource,
-      gl.VERTEX_SHADER
-    )
-    const fragmentShader = this.loadShader(
-      fragmentSource,
-      gl.FRAGMENT_SHADER
-    )
-
-    this.createProgram(vertexShader, fragmentShader)
-
-    this.detectAttributes()
-    this.detectUniforms()
   }
 
   get name(): string {
@@ -57,6 +39,22 @@ export default class Shader {
   }
 
   destroy(): void {}
+
+  protected load(vertexSource: string, fragmentSource: string): void {
+    const vertexShader = this.loadShader(
+      vertexSource,
+      gl.VERTEX_SHADER
+    )
+    const fragmentShader = this.loadShader(
+      fragmentSource,
+      gl.FRAGMENT_SHADER
+    )
+
+    this.createProgram(vertexShader, fragmentShader)
+
+    this.detectAttributes()
+    this.detectUniforms()
+  }
 
   private loadShader(source: string, type: number): WebGLShader {
     const shader = gl.createShader(type)
