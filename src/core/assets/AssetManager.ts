@@ -36,7 +36,7 @@ export default class AssetManager {
     }
 
     for (let loader of AssetManager._loaders) {
-      if (!loader.supportedExtensions.includes(extension)) {
+      if (loader.supportedExtensions.includes(extension)) {
         loader.loadAsset(assetName)
         return
       }

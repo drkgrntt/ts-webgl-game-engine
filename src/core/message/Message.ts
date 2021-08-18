@@ -1,5 +1,5 @@
-import IMessageHandler from './IMessageHandler'
-import Transporter from './Transporter'
+import IMessageHandler from './IMessageHandler.js'
+import Transporter from './Transporter.js'
 
 export enum MessagePriority {
   NORMAL,

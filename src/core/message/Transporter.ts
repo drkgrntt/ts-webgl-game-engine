@@ -14,7 +14,7 @@ export default class Transporter {
     code: string,
     handler: IMessageHandler
   ): void {
-    if (!!Transporter._subscriptions[code]) {
+    if (!Transporter._subscriptions[code]) {
       Transporter._subscriptions[code] = []
     }
 
@@ -46,7 +46,7 @@ export default class Transporter {
   }
 
   static post(message: Message): void {
-    console.log(`Message posted: ${message}`)
+    console.log(`Message posted:`, message)
     const handlers = Transporter._subscriptions[message.code]
     if (!handlers) return
 

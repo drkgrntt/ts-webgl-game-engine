@@ -35,9 +35,7 @@ export default class ImageAssetLoader implements IAssetLoader {
     assetName: string,
     image: HTMLImageElement
   ): void {
-    console.log(
-      `onImageLoaded: assetName/image ${assetName}/${image}`
-    )
+    console.log(`onImageLoaded: assetName/image,`, assetName, image)
     const asset = new ImageAsset(assetName, image)
     AssetManager.onAssetLoaded(asset)
   }
