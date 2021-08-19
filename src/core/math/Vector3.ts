@@ -33,11 +33,25 @@ export default class Vector3 {
     this._z = value
   }
 
+  static get zero(): Vector3 {
+    return new Vector3()
+  }
+
+  static get one(): Vector3 {
+    return new Vector3(1, 1, 1)
+  }
+
   toArray(): number[] {
     return [this._x, this._y, this._z]
   }
 
   toFloat32Array(): Float32Array {
     return new Float32Array(this.toArray())
+  }
+
+  copyFrom(vector: Vector3): void {
+    this._x = vector._x
+    this._y = vector._y
+    this._z = vector._z
   }
 }
