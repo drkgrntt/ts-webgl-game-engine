@@ -15,8 +15,6 @@ export default class Sprite {
   private _materialName: string
   private _material: Material
 
-  position: Vector3 = new Vector3()
-
   constructor(
     name: string,
     materialName: string,
@@ -82,13 +80,9 @@ export default class Sprite {
 
   update(time: number): void {}
 
-  draw(shader: Shader): void {
+  draw(shader: Shader, model: Matrix4x4): void {
     const modelLocation = shader.getUniformLocation('u_model')
-    gl.uniformMatrix4fv(
-      modelLocation,
-      false,
-      new Float32Array(Matrix4x4.translation(this.position).data)
-    )
+    gl.uniformMatrix4fv(modelLocation, false, model.toFloat32Array())
 
     const colorLocation = shader.getUniformLocation('u_tint')
 

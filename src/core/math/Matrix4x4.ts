@@ -62,6 +62,34 @@ export default class Matrix4x4 {
     return matrix
   }
 
+  static rotationX(angleInRadians: number): Matrix4x4 {
+    let maxrix = new Matrix4x4()
+
+    let cos = Math.cos(angleInRadians)
+    let sin = Math.sin(angleInRadians)
+
+    maxrix._data[5] = cos
+    maxrix._data[6] = sin
+    maxrix._data[9] = -sin
+    maxrix._data[10] = cos
+
+    return maxrix
+  }
+
+  static rotationY(angleInRadians: number): Matrix4x4 {
+    let matrix = new Matrix4x4()
+
+    let cos = Math.cos(angleInRadians)
+    let sin = Math.sin(angleInRadians)
+
+    matrix._data[0] = cos
+    matrix._data[2] = -sin
+    matrix._data[8] = sin
+    matrix._data[10] = cos
+
+    return matrix
+  }
+
   static rotationZ(angleInRadians: number): Matrix4x4 {
     const matrix = new Matrix4x4()
 
@@ -70,10 +98,22 @@ export default class Matrix4x4 {
 
     matrix._data[0] = cos
     matrix._data[1] = sin
-    matrix._data[5] = -sin
-    matrix._data[6] = cos
+    matrix._data[4] = -sin
+    matrix._data[5] = cos
 
     return matrix
+  }
+
+  static rotationXYZ(
+    xRadians: number,
+    yRadians: number,
+    zRadians: number
+  ): Matrix4x4 {
+    const rx = Matrix4x4.rotationX(xRadians)
+    const ry = Matrix4x4.rotationY(yRadians)
+    const rz = Matrix4x4.rotationZ(zRadians)
+
+    return Matrix4x4.multiply(Matrix4x4.multiply(rz, ry), rx)
   }
 
   static scale(scale: Vector3): Matrix4x4 {
@@ -144,5 +184,11 @@ export default class Matrix4x4 {
 
   toFloat32Array(): Float32Array {
     return new Float32Array(this._data)
+  }
+
+  copyFrom(matrix: Matrix4x4): void {
+    for (let i = 0; i < 16; i++) {
+      this._data[i] = matrix._data[i]
+    }
   }
 }

@@ -4,23 +4,20 @@ import BasicShader from './core/gl/shaders/BasicShader.js'
 import Color from './core/graphics/Color.js'
 import Material from './core/graphics/Material.js'
 import MaterialManager from './core/graphics/MaterialManager.js'
-import Sprite from './core/graphics/Sprite.js'
 import Matrix4x4 from './core/math/Matrix4x4.js'
 import Transporter from './core/message/Transporter.js'
+import ZoneManager from './core/world/ZoneManager.js'
 
 export default class Engine {
   private _canvas: HTMLCanvasElement
   private _basicShader: BasicShader
   private _projection: Matrix4x4
 
-  private _sprite: Sprite
-
   constructor() {}
 
   start(): void {
     this._canvas = GLUtilities.initialize()
     AssetManager.initialize()
-    this.resize()
 
     gl.clearColor(0.0, 0.0, 0.0, 1)
 
@@ -36,6 +33,8 @@ export default class Engine {
       )
     )
 
+    const zoneId = ZoneManager.createTestZone()
+
     // Load
     this._projection = Matrix4x4.orthographic(
       0,
@@ -46,19 +45,20 @@ export default class Engine {
       100
     )
 
-    this._sprite = new Sprite('test', 'crate')
-    this._sprite.load()
+    ZoneManager.changeZone(zoneId)
 
-    this._sprite.position.y = 200
-    this._sprite.position.x = 100
-
+    this.resize()
     this.loop()
   }
 
   loop(): void {
     Transporter.update(0)
 
+    ZoneManager.update(0)
+
     gl.clear(gl.COLOR_BUFFER_BIT)
+
+    ZoneManager.render(this._basicShader)
 
     // Set uniforms
     const projectionPosition =
@@ -68,8 +68,6 @@ export default class Engine {
       false,
       new Float32Array(this._projection.data)
     )
-
-    this._sprite.draw(this._basicShader)
 
     requestAnimationFrame(this.loop.bind(this))
   }

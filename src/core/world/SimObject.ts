@@ -1,3 +1,4 @@
+import BaseComponent from '../components/BaseComponent.js'
 import Shader from '../gl/Shader.js'
 import Matrix4x4 from '../math/Matrix4x4.js'
 import Transform from '../math/Transform.js'
@@ -9,6 +10,7 @@ export default class SimObject {
   private _parent: SimObject
   private _isLoaded: boolean = false
   private _scene: Scene
+  private _components: BaseComponent[] = []
 
   private _localMatrix: Matrix4x4 = Matrix4x4.identity()
   private _worldMatrix: Matrix4x4 = Matrix4x4.identity()
@@ -68,8 +70,17 @@ export default class SimObject {
     }
   }
 
+  addComponent(component: BaseComponent) {
+    this._components.push(component)
+    component.setOwner(this)
+  }
+
   load(): void {
     this._isLoaded = true
+
+    for (let component of this._components) {
+      component.load()
+    }
 
     for (let child of this._children) {
       child.load()
@@ -77,12 +88,25 @@ export default class SimObject {
   }
 
   update(time: number): void {
+    this._localMatrix = this.transform.getTransformationMatrix()
+    this.updateWorldMatrix(
+      this._parent ? this._parent._worldMatrix : undefined
+    )
+
+    for (let component of this._components) {
+      component.update(time)
+    }
+
     for (let child of this._children) {
       child.update(time)
     }
   }
 
   render(shader: Shader): void {
+    for (let component of this._components) {
+      component.render(shader)
+    }
+
     for (let child of this._children) {
       child.render(shader)
     }
@@ -90,5 +114,16 @@ export default class SimObject {
 
   protected onAdded(scene: Scene): void {
     this._scene = scene
+  }
+
+  private updateWorldMatrix(parentWorldMatrix?: Matrix4x4): void {
+    if (parentWorldMatrix) {
+      this._worldMatrix = Matrix4x4.multiply(
+        parentWorldMatrix,
+        this._localMatrix
+      )
+    } else {
+      this._worldMatrix.copyFrom(this._localMatrix)
+    }
   }
 }
