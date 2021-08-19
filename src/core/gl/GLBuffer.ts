@@ -118,7 +118,7 @@ export default class GLBuffer {
       gl.disableVertexAttribArray(attribute.location)
     }
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer)
+    gl.bindBuffer(this._targetBufferType, null)
   }
 
   /**
