@@ -28,4 +28,18 @@ export default class Transform {
       scale
     )
   }
+
+  setFromJson(json: any): void {
+    if (json.position !== undefined) {
+      this.position.setFromJson(json.position)
+    }
+
+    if (json.rotation !== undefined) {
+      this.rotation.setFromJson(json.rotation)
+    }
+
+    if (json.scale !== undefined) {
+      this.scale.setFromJson(json.scale)
+    }
+  }
 }

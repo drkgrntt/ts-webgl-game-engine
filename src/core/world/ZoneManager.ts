@@ -1,51 +1,54 @@
+import AssetManager, {
+  MESSAGE_ASSET_LOADER_ASSET_LOADED,
+} from '../assets/AssetManager.js'
+import IAsset from '../assets/IAsset.js'
+import { JsonAsset } from '../assets/JsonAssetLoader.js'
 import Shader from '../gl/Shader.js'
-import TestZone from './TestZone.js'
+import IMessageHandler from '../message/IMessageHandler.js'
+import Message from '../message/Message.js'
 import Zone from './Zone.js'
 
-export default class ZoneManager {
+export default class ZoneManager implements IMessageHandler {
   private static _globalZoneId: number = -1
-  private static _zones: Record<number, Zone> = {}
+  // private static _zones: Record<number, Zone> = {}
+  private static _registerdZones: Record<number, string> = {}
   private static _activeZone: Zone
+  private static _instance: ZoneManager
 
   private constructor() {}
 
-  static createZone(name: string, description: string): number {
-    ZoneManager._globalZoneId++
+  static initialize(): void {
+    ZoneManager._instance = new ZoneManager()
 
-    const zone = new Zone(
-      ZoneManager._globalZoneId,
-      name,
-      description
-    )
-    ZoneManager._zones[ZoneManager._globalZoneId] = zone
-
-    return ZoneManager._globalZoneId
-  }
-
-  // TODO: This is temporary code until file loading is supported
-  static createTestZone(): number {
-    ZoneManager._globalZoneId++
-
-    const zone = new TestZone(
-      ZoneManager._globalZoneId,
-      'test',
-      'A simple test zone'
-    )
-    ZoneManager._zones[ZoneManager._globalZoneId] = zone
-
-    return ZoneManager._globalZoneId
+    // Temporary
+    ZoneManager._registerdZones[0] = 'assets/zones/testZone.json'
   }
 
   static changeZone(id: number): void {
     if (ZoneManager._activeZone) {
       ZoneManager._activeZone.onDeactivated()
       ZoneManager._activeZone.unload()
+
+      // @ts-ignore
+      ZoneManager._activeZone = undefined
     }
 
-    if (ZoneManager._zones[id]) {
-      ZoneManager._activeZone = ZoneManager._zones[id]
-      ZoneManager._activeZone.onActivated()
-      ZoneManager._activeZone.load()
+    if (!ZoneManager._registerdZones[id]) {
+      throw new Error(`Zone id: ${id.toString()} does not exist.`)
+    }
+
+    if (AssetManager.isAssetLoaded(ZoneManager._registerdZones[id])) {
+      const asset = AssetManager.getAsset(
+        ZoneManager._registerdZones[id]
+      )
+      ZoneManager.loadZone(asset as IAsset)
+    } else {
+      Message.subscribe(
+        MESSAGE_ASSET_LOADER_ASSET_LOADED +
+          ZoneManager._registerdZones[id],
+        ZoneManager._instance
+      )
+      AssetManager.loadAsset(ZoneManager._registerdZones[id])
     }
   }
 
@@ -59,5 +62,46 @@ export default class ZoneManager {
     if (ZoneManager._activeZone) {
       ZoneManager._activeZone.render(shader)
     }
+  }
+
+  onMessage(message: Message): void {
+    if (message.code.includes(MESSAGE_ASSET_LOADER_ASSET_LOADED)) {
+      const asset = message.context as JsonAsset
+      ZoneManager.loadZone(asset)
+    }
+  }
+
+  private static loadZone(asset: JsonAsset): void {
+    const zoneData = asset.data
+
+    let zoneId: number
+    if (zoneData.id === undefined) {
+      throw new Error(
+        `Zone file format exception: Zone id not present`
+      )
+    }
+    zoneId = Number(zoneData.id)
+
+    let zoneName: string
+    if (zoneData.id === undefined) {
+      throw new Error(
+        `Zone file format exception: Zone name not present`
+      )
+    }
+    zoneName = String(zoneData.name)
+
+    let zoneDescription: string | undefined
+    if (zoneData.id !== undefined) {
+      zoneDescription = String(zoneData.description)
+    }
+
+    ZoneManager._activeZone = new Zone(
+      zoneId,
+      zoneName,
+      zoneDescription
+    )
+    ZoneManager._activeZone.initialize(zoneData)
+    ZoneManager._activeZone.onActivated()
+    ZoneManager._activeZone.load()
   }
 }

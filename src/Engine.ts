@@ -18,6 +18,7 @@ export default class Engine {
   start(): void {
     this._canvas = GLUtilities.initialize()
     AssetManager.initialize()
+    ZoneManager.initialize()
 
     gl.clearColor(0.0, 0.0, 0.0, 1)
 
@@ -33,8 +34,6 @@ export default class Engine {
       )
     )
 
-    const zoneId = ZoneManager.createTestZone()
-
     // Load
     this._projection = Matrix4x4.orthographic(
       0,
@@ -45,7 +44,8 @@ export default class Engine {
       100
     )
 
-    ZoneManager.changeZone(zoneId)
+    // TODO change this to be read from a config later
+    ZoneManager.changeZone(0)
 
     this.resize()
     this.loop()
