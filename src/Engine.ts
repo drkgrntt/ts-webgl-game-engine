@@ -7,6 +7,7 @@ import MaterialManager from './core/graphics/MaterialManager.js'
 import Matrix4x4 from './core/math/Matrix4x4.js'
 import Transporter from './core/message/Transporter.js'
 import ZoneManager from './core/world/ZoneManager.js'
+import './core/components/SpriteComponent.js'
 
 export default class Engine {
   private _canvas: HTMLCanvasElement

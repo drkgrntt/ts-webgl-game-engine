@@ -1,12 +1,16 @@
 import Shader from '../gl/Shader.js'
 import SimObject from '../world/SimObject.js'
+import IComponent from './IComponent.js'
+import IComponentData from './IComponentData.js'
 
-export default abstract class BaseComponent {
+export default abstract class BaseComponent implements IComponent {
   protected _owner: SimObject
+  protected _data: IComponentData
   name: string
 
-  constructor(name: string) {
-    this.name = name
+  constructor(data: IComponentData) {
+    this._data = data
+    this.name = data.name
   }
 
   get owner(): SimObject {
@@ -18,6 +22,8 @@ export default abstract class BaseComponent {
   }
 
   load(): void {}
+
+  unload(): void {}
 
   update(time: number): void {}
 
