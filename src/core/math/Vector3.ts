@@ -68,4 +68,36 @@ export default class Vector3 {
       this._z = Number(json.z)
     }
   }
+
+  add(vector: Vector3): Vector3 {
+    this._x += vector._x
+    this._y += vector._y
+    this._z += vector._z
+
+    return this
+  }
+
+  subtract(vector: Vector3): Vector3 {
+    this._x -= vector._x
+    this._y -= vector._y
+    this._z -= vector._z
+
+    return this
+  }
+
+  multiply(vector: Vector3): Vector3 {
+    this._x *= vector._x
+    this._y *= vector._y
+    this._z *= vector._z
+
+    return this
+  }
+
+  divide(vector: Vector3): Vector3 {
+    this._x /= vector._x
+    this._y /= vector._y
+    this._z /= vector._z
+
+    return this
+  }
 }

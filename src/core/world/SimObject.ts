@@ -1,4 +1,4 @@
-import BaseComponent from '../components/BaseComponent.js'
+import IBehavior from '../behaviors/IBehavior.js'
 import IComponent from '../components/IComponent.js'
 import Shader from '../gl/Shader.js'
 import Matrix4x4 from '../math/Matrix4x4.js'
@@ -12,6 +12,7 @@ export default class SimObject {
   private _isLoaded: boolean = false
   private _scene: Scene
   private _components: IComponent[] = []
+  private _behaviors: IBehavior[] = []
 
   private _localMatrix: Matrix4x4 = Matrix4x4.identity()
   private _worldMatrix: Matrix4x4 = Matrix4x4.identity()
@@ -71,9 +72,14 @@ export default class SimObject {
     }
   }
 
-  addComponent(component: IComponent) {
+  addComponent(component: IComponent): void {
     this._components.push(component)
     component.setOwner(this)
+  }
+
+  addBehavior(behavior: IBehavior): void {
+    this._behaviors.push(behavior)
+    behavior.setOwner(this)
   }
 
   load(): void {
@@ -96,6 +102,10 @@ export default class SimObject {
 
     for (let component of this._components) {
       component.update(time)
+    }
+
+    for (let behavior of this._behaviors) {
+      behavior.update(time)
     }
 
     for (let child of this._children) {

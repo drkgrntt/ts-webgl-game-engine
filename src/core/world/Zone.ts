@@ -1,3 +1,4 @@
+import BehaviorManager from '../behaviors/BehaviorManager.js'
 import ComponentManager from '../components/ComponentManager.js'
 import Shader from '../gl/Shader.js'
 import Scene from './Scene.js'
@@ -97,6 +98,15 @@ export default class Zone {
           dataSection.components[c]
         )
         simObject.addComponent(component)
+      }
+    }
+
+    if (Array.isArray(dataSection.behaviors)) {
+      for (let b in dataSection.behaviors) {
+        const behavior = BehaviorManager.extractBehavior(
+          dataSection.behaviors[b]
+        )
+        simObject.addBehavior(behavior)
       }
     }
 

@@ -8,6 +8,7 @@ import Matrix4x4 from './core/math/Matrix4x4.js'
 import Transporter from './core/message/Transporter.js'
 import ZoneManager from './core/world/ZoneManager.js'
 import './core/components/SpriteComponent.js'
+import './core/behaviors/RotationBehavior.js'
 
 export default class Engine {
   private _canvas: HTMLCanvasElement
