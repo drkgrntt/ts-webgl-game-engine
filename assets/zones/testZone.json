@@ -26,6 +26,15 @@
               "materialName": "crate",
               "type": "sprite"
             }
+          ],
+          "behaviors": [
+            {
+              "name": "rotateX",
+              "type": "rotation",
+              "rotation": {
+                "z": -0.02
+              }
+            }
           ]
         }
       ],
