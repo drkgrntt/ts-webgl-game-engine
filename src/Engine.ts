@@ -16,6 +16,7 @@ import './core/behaviors/RotationBehavior.js'
 import './core/behaviors/KeyboardMovementBehavior.js'
 import IMessageHandler from './core/message/IMessageHandler.js'
 import Message from './core/message/Message.js'
+import AudioManager from './core/audio/AudioManager.js'
 
 export default class Engine implements IMessageHandler {
   private _canvas: HTMLCanvasElement
@@ -48,6 +49,12 @@ export default class Engine implements IMessageHandler {
     )
     MaterialManager.registerMaterial(
       new Material('bird', 'assets/textures/bird.png', Color.white())
+    )
+
+    AudioManager.loadSoundFile(
+      'flap',
+      'assets/sounds/flap.mp3',
+      false
     )
 
     // Load
@@ -88,6 +95,8 @@ export default class Engine implements IMessageHandler {
     if (message.code === 'MOUSE_UP') {
       const context = message.context as MouseContext
       document.title = `Position: [${context.position.x}, ${context.position.y}]`
+
+      AudioManager.playSound('flap')
     }
   }
 
