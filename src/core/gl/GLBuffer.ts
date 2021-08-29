@@ -17,7 +17,7 @@ export class AttributeInfo {
   /**
    * The number of elements fromt he beginning of the buffer
    */
-  offset: number
+  offset: number = 0
 }
 
 /**
@@ -25,7 +25,7 @@ export class AttributeInfo {
  */
 export default class GLBuffer {
   private _hasAttributeLocation: boolean = false
-  private _elementSize: number
+  private _elementSize: number = 0
   private _stride: number
   private _buffer: WebGLBuffer
 
@@ -38,12 +38,10 @@ export default class GLBuffer {
   private _attributes: AttributeInfo[] = []
 
   constructor(
-    elementSize: number,
     dataType: number = gl.FLOAT,
     targetBufferType: number = gl.ARRAY_BUFFER,
     mode: number = gl.TRIANGLES
   ) {
-    this._elementSize = elementSize
     this._dataType = dataType
     this._targetBufferType = targetBufferType
     this._mode = mode
@@ -72,7 +70,6 @@ export default class GLBuffer {
         )
     }
 
-    this._stride = this._elementSize * this._typeSize
     const buffer = gl.createBuffer()
     if (!buffer) {
       throw new Error('Could not create buffer')
@@ -127,17 +124,36 @@ export default class GLBuffer {
    */
   addAttributeLocation(info: AttributeInfo): void {
     this._hasAttributeLocation = true
+    info.offset = this._elementSize
     this._attributes.push(info)
+    this._elementSize += info.size
+    this._stride = this._elementSize * this._typeSize
+  }
+
+  /**
+   * Replaces the current data in this buffer with the provided data
+   * @param data The data to be loaded in this buffer
+   */
+  setData(data: number[]): void {
+    this.clearData()
+    this.pushBackData(data)
   }
 
   /**
    * Adds data to this buffer
-   * @param data
+   * @param data The data to be added
    */
   pushBackData(data: number[]): void {
     for (let d of data) {
       this._data.push(d)
     }
+  }
+
+  /**
+   * Clears out all data in this buffer
+   */
+  clearData(): void {
+    this._data.length = 0
   }
 
   /**

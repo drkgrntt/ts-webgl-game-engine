@@ -23,6 +23,19 @@ export default class Vector2 {
     this._y = value
   }
 
+  static get zero(): Vector2 {
+    return new Vector2()
+  }
+
+  static get one(): Vector2 {
+    return new Vector2(1, 1)
+  }
+
+  copyFrom(vector: Vector2): void {
+    this._x = vector._x
+    this._y = vector._y
+  }
+
   toArray(): number[] {
     return [this._x, this._y]
   }

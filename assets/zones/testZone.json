@@ -4,6 +4,37 @@
   "id": 0,
   "objects": [
     {
+      "name": "bird",
+      "transform": {
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "scale": {
+          "x": 8,
+          "y": 8
+        }
+      },
+      "components":[
+        {
+          "name": "birdAnimatedSprite",
+          "type": "animatedSprite",
+          "materialName": "bird",
+          "frameWidth": 16,
+          "frameHeight": 15,
+          "frameCount": 3,
+          "frameSequence": [0, 1, 2, 1]
+        }
+      ],
+      "behaviors": [
+        {
+          "name": "movementBehavior",
+          "type": "keyboardMovement",
+          "speed": 2
+        }
+      ]
+    },
+    {
       "name": "parentObject",
       "transform": {
         "position": {
